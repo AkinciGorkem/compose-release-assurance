@@ -1,0 +1,61 @@
+# Secrets and environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.kdbx
+secrets/
+!secrets.example/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Tooling and local state
+.idea/
+.vscode/
+!.vscode/extensions.json
+*.log
+logs/
+tmp/
+.cache/
+
+# Generated rehearsal evidence
+artifacts/*
+!artifacts/.gitkeep
+
+# Ansible
+*.retry
+ansible/vault_pass.txt
+
+# Terraform and infrastructure state
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
