@@ -155,3 +155,4 @@ Describe the selected approach.
 | ------------------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
 
 | \[ADR-0001](0001-host-cli-orchestration.md) | Accepted | Release orchestration runs on an authorized host or CI runner instead of an application container with Docker socket access. |
+| [ADR-0002](0002-python-first-runtime-and-language-boundaries.md) | Accepted | Python is the primary runtime; SQL, YAML, Bash, PowerShell, JSON, Markdown, and HTML/CSS have explicit boundaries. |
