@@ -52,8 +52,11 @@ The project avoids unnecessary polyglot architecture during the MVP.
 
 
 
-\*\*Baseline runtime:\*\* Python 3.12
+\*\*Initial supported runtime:\*\* Python 3.14
 
+Python 3.14 is the initial supported runtime for local development, CI, and the reference container environment.
+
+Additional Python versions must not be presented as supported until automated CI validation proves compatibility.
 
 
 Python will be used for all core executable product logic.
