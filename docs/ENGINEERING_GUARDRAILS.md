@@ -15,10 +15,10 @@ The goal is to provide a reusable, secure, observable, testable, and recoverable
 The project must remain:
 
 * Useful without relying on a specific company, vendor, or private environment.
-* Safe to publish as open source.
+* Safe to publish as a public, source-available project.
 * Free of real customer data, real credentials, internal endpoints, company source code, internal logs, or confidential infrastructure details.
 * Designed for synthetic financial-event data only.
-* Explainable to engineers, managers, security teams, and open-source contributors.
+* Explainable to engineers, managers, security teams, and public contributors.
 
 ---
 

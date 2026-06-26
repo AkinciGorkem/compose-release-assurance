@@ -1,224 +1,149 @@
-\# ADR-0002: Adopt a Python-First Runtime and Explicit Language Boundaries
+# ADR-0002: Adopt a Python-First Runtime and Explicit Language Boundaries
 
+**Status:** Accepted
 
+**Date:** 2026-06-25
+> **Superseded in part:** The Python minor-version baseline in this ADR is superseded by [ADR-0003](0003-python-314-runtime-baseline.md). The Python-first language-boundary decision remains accepted.
 
-\*\*Status:\*\* Accepted
-
-\*\*Date:\*\* 2026-06-25
-
-
-
-\## Context
-
-
+## Context
 
 Compose Release Assurance requires:
 
+* A synthetic REST API
 
+* A command-line release orchestration tool
 
-\* A synthetic REST API
+* Docker Compose control
 
-\* A command-line release orchestration tool
+* Evidence collection and normalization
 
-\* Docker Compose control
+* Security and quality adapter support
 
-\* Evidence collection and normalization
+* Automated tests
 
-\* Security and quality adapter support
+* Database integrity validation
 
-\* Automated tests
-
-\* Database integrity validation
-
-\* Ansible and Azure Pipelines integration references
-
-
+* Ansible and Azure Pipelines integration references
 
 Using multiple implementation languages during the MVP would increase build complexity, onboarding cost, dependency management, test duplication, CI complexity, and security review surface.
 
+The project must remain understandable to public contributors while demonstrating production-oriented engineering practices.
 
-
-The project must remain understandable to open-source contributors while demonstrating production-oriented engineering practices.
-
-
-
-\## Decision
-
-
+## Decision
 
 The project adopts Python 3.12 as the primary implementation runtime.
 
-
-
 Python will be used for:
 
+* `ledger-api`
 
+* `rehearsalctl`
 
-\* `ledger-api`
+* Integrity validation
 
-\* `rehearsalctl`
+* Evidence builder
 
-\* Integrity validation
+* Scenario runner
 
-\* Evidence builder
+* Release-policy engine
 
-\* Scenario runner
+* Integration adapters
 
-\* Release-policy engine
-
-\* Integration adapters
-
-\* Tests and developer tooling
-
-
+* Tests and developer tooling
 
 Declarative and specialized languages are limited to their appropriate boundaries:
 
+* SQL for PostgreSQL schema and integrity constraints
 
+* YAML for Docker Compose, Ansible, Azure Pipelines, Prometheus configuration, and scenario metadata
 
-\* SQL for PostgreSQL schema and integrity constraints
+* Bash for Linux operational helper scripts
 
-\* YAML for Docker Compose, Ansible, Azure Pipelines, Prometheus configuration, and scenario metadata
+* PowerShell for local Windows developer bootstrap only
 
-\* Bash for Linux operational helper scripts
+* JSON for machine-readable evidence contracts
 
-\* PowerShell for local Windows developer bootstrap only
+* Markdown for documentation
 
-\* JSON for machine-readable evidence contracts
+* HTML and CSS for future static report rendering
 
-\* Markdown for documentation
+## Consequences
 
-\* HTML and CSS for future static report rendering
+### Positive
 
+* One primary language for product logic, testing, adapters, and automation.
 
+* Lower cognitive load for contributors.
 
-\## Consequences
+* Clear separation between business logic and infrastructure configuration.
 
+* Easier quality-gate and dependency management.
 
+* Better reuse of validation, logging, error handling, and evidence models.
 
-\### Positive
+* Simpler public repository onboarding.
 
+### Negative
 
+* The project does not demonstrate multiple backend languages.
 
-\* One primary language for product logic, testing, adapters, and automation.
+* Some future integrations may have stronger native libraries in another ecosystem.
 
-\* Lower cognitive load for contributors.
+* Python runtime performance must be measured and monitored rather than assumed.
 
-\* Clear separation between business logic and infrastructure configuration.
+* The team must resist adding asynchronous complexity without a demonstrated requirement.
 
-\* Easier quality-gate and dependency management.
+## Alternatives Considered
 
-\* Better reuse of validation, logging, error handling, and evidence models.
-
-\* Simpler public repository onboarding.
-
-
-
-\### Negative
-
-
-
-\* The project does not demonstrate multiple backend languages.
-
-\* Some future integrations may have stronger native libraries in another ecosystem.
-
-\* Python runtime performance must be measured and monitored rather than assumed.
-
-\* The team must resist adding asynchronous complexity without a demonstrated requirement.
-
-
-
-\## Alternatives Considered
-
-
-
-\### C# and .NET
-
-
+### C# and .NET
 
 Rejected for MVP.
-
-
 
 C# is a strong enterprise option, but selecting it would require rewriting the planned Python API and CLI approach. Mixing C# with Python would increase complexity without delivering a required product benefit.
 
-
-
-\### Go
-
-
+### Go
 
 Rejected for MVP.
-
-
 
 Go is suitable for systems programming and CLI tools. However, it would add learning, implementation, testing, and maintenance cost without solving a proven MVP requirement.
 
-
-
-\### JavaScript or TypeScript
-
-
+### JavaScript or TypeScript
 
 Rejected for MVP.
-
-
 
 The project has no browser-based management interface in scope. Adding a Node.js runtime would create unnecessary dependency and CI complexity.
 
-
-
-\### Polyglot architecture
-
-
+### Polyglot architecture
 
 Rejected for MVP.
 
-
-
 Multiple implementation languages would increase operational and security review surface while reducing repository simplicity.
 
+## Security Impact
 
+* Fewer runtime ecosystems reduce dependency and supply-chain surface.
 
-\## Security Impact
+* Core policy and integrity logic remain in one testable language.
 
+* Bash and PowerShell are restricted from owning business or release-decision logic.
 
+* YAML remains declarative and does not replace tested Python validation.
 
-\* Fewer runtime ecosystems reduce dependency and supply-chain surface.
+## Operational Impact
 
-\* Core policy and integrity logic remain in one testable language.
+* Contributors need one primary runtime: Python.
 
-\* Bash and PowerShell are restricted from owning business or release-decision logic.
+* CI requires one primary language toolchain.
 
-\* YAML remains declarative and does not replace tested Python validation.
+* Docker images can use a consistent Python base image strategy.
 
+* Development, testing, and troubleshooting workflows become more uniform.
 
-
-\## Operational Impact
-
-
-
-\* Contributors need one primary runtime: Python.
-
-\* CI requires one primary language toolchain.
-
-\* Docker images can use a consistent Python base image strategy.
-
-\* Development, testing, and troubleshooting workflows become more uniform.
-
-
-
-\## Rollback Plan
-
-
+## Rollback Plan
 
 This decision may be revisited only when a specific requirement cannot be met safely or maintainably with the current Python-first approach.
 
-
-
 Any future change introducing another primary runtime requires:
-
-
 
 ```text
 

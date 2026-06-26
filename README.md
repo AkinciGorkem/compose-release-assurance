@@ -1,120 +1,80 @@
-\# Compose Release Assurance
+# Compose Release Assurance
 
-
-
-Compose Release Assurance is an open-source, production-engineered reference framework for validating whether a Docker Compose-based stateful application is ready for release.
-
-
+Compose Release Assurance is a publicly available, source-available, production-engineered reference framework for validating whether a Docker Compose-based stateful application is ready for release.
 
 It combines quality, security, deployment, runtime health, recovery, and data-integrity evidence into one repeatable release rehearsal workflow.
 
+> **Project status:** Pre-alpha. The repository is currently in the architecture and engineering-foundation phase.
 
-
-> \*\*Project status:\*\* Pre-alpha. The repository is currently in the architecture and engineering-foundation phase.
-
-
-
-\## Why This Project Exists
-
-
+## Why This Project Exists
 
 A successful build or green deployment job does not prove that a stateful release is operationally safe.
 
-
-
 Before a release proceeds, engineering teams need evidence that:
 
+* The application starts correctly.
 
+* Dependencies are reachable and ready.
 
-\* The application starts correctly.
+* Health and readiness checks pass.
 
-\* Dependencies are reachable and ready.
+* A restart does not create duplicate writes.
 
-\* Health and readiness checks pass.
+* Database state remains valid after recovery scenarios.
 
-\* A restart does not create duplicate writes.
+* Runtime metrics and diagnostics are available.
 
-\* Database state remains valid after recovery scenarios.
+* Quality and security evidence is visible.
 
-\* Runtime metrics and diagnostics are available.
-
-\* Quality and security evidence is visible.
-
-\* The release can be classified as `GO`, `CONDITIONAL\_GO`, or `NO\_GO`.
-
-
+* The release can be classified as `GO`, `CONDITIONAL_GO`, or `NO_GO`.
 
 Compose Release Assurance provides a structured way to execute these checks and create an auditable evidence bundle.
 
+## What It Is
 
+* A release-rehearsal framework for Docker Compose-based stateful services.
 
-\## What It Is
+* A reference implementation for secure, observable, testable, and recoverable delivery workflows.
 
+* A vendor-neutral evidence normalization layer.
 
+* A learning-oriented, engineering-focused, public, source-available project.
 
-\* A release-rehearsal framework for Docker Compose-based stateful services.
+## What It Is Not
 
-\* A reference implementation for secure, observable, testable, and recoverable delivery workflows.
+* A replacement for CI/CD systems, registries, security scanners, monitoring platforms, or deployment tools.
 
-\* A vendor-neutral evidence normalization layer.
+* A certified production platform for regulated financial environments.
 
-\* A learning-oriented but engineering-focused open-source project.
+* A real payment system.
 
+* A repository containing real customer data, real credentials, private infrastructure data, or company-specific configurations.
 
-
-\## What It Is Not
-
-
-
-\* A replacement for CI/CD systems, registries, security scanners, monitoring platforms, or deployment tools.
-
-\* A certified production platform for regulated financial environments.
-
-\* A real payment system.
-
-\* A repository containing real customer data, real credentials, private infrastructure data, or company-specific configurations.
-
-
-
-\## Reference Application
-
-
+## Reference Application
 
 The project will include a synthetic reference service named `ledger-api`.
 
-
-
 It will demonstrate:
 
+* Transaction creation
 
+* PostgreSQL persistence
 
-\* Transaction creation
+* Idempotency-key support
 
-\* PostgreSQL persistence
+* Double-entry ledger records
 
-\* Idempotency-key support
+* Audit records
 
-\* Double-entry ledger records
+* Health and readiness endpoints
 
-\* Audit records
-
-\* Health and readiness endpoints
-
-\* Prometheus metrics
-
-
+* Prometheus metrics
 
 All data is synthetic. No real financial transaction or personal data is used.
 
-
-
-\## Planned MVP
-
-
+## Planned MVP
 
 The first meaningful product milestone is:
-
-
 
 ```text
 
@@ -122,75 +82,57 @@ rehearsalctl rehearse --scenario api-restart
 
 ```
 
-
-
 The command will:
 
+1. Start the Docker Compose stack.
 
+2. Validate application health and readiness.
 
-1\. Start the Docker Compose stack.
+3. Create a synthetic transfer.
 
-2\. Validate application health and readiness.
+4. Restart the API container in a controlled manner.
 
-3\. Create a synthetic transfer.
+5. Retry the request with the same idempotency key.
 
-4\. Restart the API container in a controlled manner.
+6. Confirm that no duplicate transaction was created.
 
-5\. Retry the request with the same idempotency key.
+7. Validate ledger integrity.
 
-6\. Confirm that no duplicate transaction was created.
+8. Collect runtime diagnostics and metrics.
 
-7\. Validate ledger integrity.
+9. Generate an evidence bundle.
 
-8\. Collect runtime diagnostics and metrics.
+10. Return `GO` or `NO_GO`.
 
-9\. Generate an evidence bundle.
-
-10\. Return `GO` or `NO\_GO`.
-
-
-
-\## Architecture Principles
-
-
+## Architecture Principles
 
 This project follows the engineering rules defined in:
 
+* [`docs/ENGINEERING_GUARDRAILS.md`](docs/ENGINEERING_GUARDRAILS.md)
 
+* [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
-\* \[`docs/ENGINEERING\_GUARDRAILS.md`](docs/ENGINEERING\_GUARDRAILS.md)
+* [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md)
 
-\* \[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
-
-\* \[`docs/THREAT\_MODEL.md`](docs/THREAT\_MODEL.md)
-
-\* \[`docs/ACCEPTANCE\_CRITERIA.md`](docs/ACCEPTANCE\_CRITERIA.md)
-
-
+* [`docs/ACCEPTANCE_CRITERIA.md`](docs/ACCEPTANCE_CRITERIA.md)
 
 Primary priorities are:
 
+1. Security and confidentiality
 
+2. Data integrity
 
-1\. Security and confidentiality
+3. Safe failure and recovery
 
-2\. Data integrity
+4. Observability
 
-3\. Safe failure and recovery
+5. Maintainability
 
-4\. Observability
+6. Reproducibility
 
-5\. Maintainability
+7. Performance
 
-6\. Reproducibility
-
-7\. Performance
-
-
-
-\## Planned Technology Stack
-
-
+## Planned Technology Stack
 
 ```text
 
@@ -220,15 +162,9 @@ Registry reference: Nexus-compatible configuration
 
 ```
 
-
-
 Enterprise integrations remain optional and vendor-neutral.
 
-
-
-\## Repository Structure
-
-
+## Repository Structure
 
 ```text
 
@@ -256,90 +192,68 @@ artifacts/          Generated local evidence bundles; excluded from Git
 
 ```
 
+## Roadmap
 
+* [x] Product vision and engineering guardrails
 
-\## Roadmap
+* [x] Architecture and threat model
 
+* [x] Initial Architecture Decision Record
 
+* [ ] Repository tooling and Python quality gates
 
-\* \[x] Product vision and engineering guardrails
+* [ ] `ledger-api` reference service
 
-\* \[x] Architecture and threat model
+* [ ] Docker Compose core stack
 
-\* \[x] Initial Architecture Decision Record
+* [ ] API restart rehearsal scenario
 
-\* \[ ] Repository tooling and Python quality gates
+* [ ] Integrity validation
 
-\* \[ ] `ledger-api` reference service
+* [ ] Prometheus and Grafana observability
 
-\* \[ ] Docker Compose core stack
+* [ ] Evidence bundle generation
 
-\* \[ ] API restart rehearsal scenario
+* [ ] Grype scan and SBOM support
 
-\* \[ ] Integrity validation
+* [ ] Ansible deployment and rollback
 
-\* \[ ] Prometheus and Grafana observability
+* [ ] Azure Pipelines reference workflow
 
-\* \[ ] Evidence bundle generation
+* [ ] Public release documentation
 
-\* \[ ] Grype scan and SBOM support
-
-\* \[ ] Ansible deployment and rollback
-
-\* \[ ] Azure Pipelines reference workflow
-
-\* \[ ] Public release documentation
-
-
-
-\## Security and Confidentiality
-
-
+## Security and Confidentiality
 
 Do not commit:
 
+* Credentials, tokens, certificates, SSH keys, or `.env` files
 
+* Internal URLs, IP addresses, hostnames, or pipeline details
 
-\* Credentials, tokens, certificates, SSH keys, or `.env` files
+* Real logs, scanner reports, screenshots, or company artifacts
 
-\* Internal URLs, IP addresses, hostnames, or pipeline details
-
-\* Real logs, scanner reports, screenshots, or company artifacts
-
-\* Customer, transaction, or personal data
-
-
+* Customer, transaction, or personal data
 
 Use synthetic data and example configuration files only.
 
+Security guidance is documented in [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
 
-
-Security guidance is documented in \[`docs/THREAT\_MODEL.md`](docs/THREAT\_MODEL.md).
-
-
-
-\## Contributing
-
-
+## Contributing
 
 The project is under active development.
 
-
-
 Before contributing, read:
 
+* [`docs/ENGINEERING_GUARDRAILS.md`](docs/ENGINEERING_GUARDRAILS.md)
 
+* [`docs/ACCEPTANCE_CRITERIA.md`](docs/ACCEPTANCE_CRITERIA.md)
 
-\* \[`docs/ENGINEERING\_GUARDRAILS.md`](docs/ENGINEERING\_GUARDRAILS.md)
+* [`docs/adr/README.md`](docs/adr/README.md)
 
-\* \[`docs/ACCEPTANCE\_CRITERIA.md`](docs/ACCEPTANCE\_CRITERIA.md)
+## License
 
-\* \[`docs/adr/README.md`](docs/adr/README.md)
+Compose Release Assurance is source-available under the Apache License, Version 2.0, with the Commons Clause License Condition v1.0.
 
+You may use, study, modify, and share the Software subject to the license terms. You may not sell the Software as defined in [`LICENSE`](LICENSE).
 
-
-\## License
-
-
-
-This project is licensed under the Apache License 2.0. See \[`LICENSE`](LICENSE).
+See [`NOTICE`](NOTICE) and [`docs/LICENSE_POLICY.md`](docs/LICENSE_POLICY.md).

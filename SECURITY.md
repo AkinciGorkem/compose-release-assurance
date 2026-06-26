@@ -1,46 +1,24 @@
-\# Security Policy
+# Security Policy
 
+## 1. Security Commitment
 
-
-\## 1. Security Commitment
-
-
-
-Compose Release Assurance is an open-source, production-engineered reference implementation.
-
-
+Compose Release Assurance is a publicly available, source-available, production-engineered reference implementation.
 
 It is not certified for regulated production use. Security, integrity, and confidentiality are still treated as first-class engineering requirements.
 
-
-
 The project must fail conservatively: an unverified mandatory check must not result in `GO`.
 
-
-
-\## 2. Supported Scope
-
-
+## 2. Supported Scope
 
 During the pre-alpha stage, security fixes are applied to the current `main` branch.
 
-
-
 The project currently supports local development, controlled test environments, and authorized CI runners only.
 
-
-
-\## 3. Reporting a Vulnerability
-
-
+## 3. Reporting a Vulnerability
 
 Do not open a public GitHub issue for a suspected vulnerability.
 
-
-
 Use GitHub Private Security Advisories when the repository enables them. Until then, report the issue privately to:
-
-
 
 ```text
 
@@ -48,164 +26,118 @@ g.akinci@protonmail.com
 
 ```
 
-
-
 A report should include:
 
+* Clear description of the issue
 
+* Affected component or file
 
-\* Clear description of the issue
+* Reproduction steps
 
-\* Affected component or file
+* Potential impact
 
-\* Reproduction steps
+* Proof of concept only when it does not expose secrets or private infrastructure
 
-\* Potential impact
-
-\* Proof of concept only when it does not expose secrets or private infrastructure
-
-\* Suggested mitigation, when available
-
-
+* Suggested mitigation, when available
 
 Do not include passwords, tokens, internal URLs, customer data, real scanner exports, or private company information.
 
-
-
-\## 4. Disclosure Process
-
-
+## 4. Disclosure Process
 
 The project aims to follow this process:
 
-
-
 ```text
 
-1\. Acknowledge receipt of the report.
+1. Acknowledge receipt of the report.
 
-2\. Assess impact and reproducibility.
+2. Assess impact and reproducibility.
 
-3\. Develop and test a fix.
+3. Develop and test a fix.
 
-4\. Publish a coordinated security update when appropriate.
+4. Publish a coordinated security update when appropriate.
 
-5\. Credit the reporter when permission is provided.
+5. Credit the reporter when permission is provided.
 
 ```
 
+Response timing may vary because this is an independently maintained publicly available, source-available project. No fixed response-time guarantee is made.
 
-
-Response timing may vary because this is an independently maintained open-source project. No fixed response-time guarantee is made.
-
-
-
-\## 5. In Scope
-
-
+## 5. In Scope
 
 Examples of security-relevant reports:
 
+* Secret exposure through repository files, logs, diagnostics, or generated artifacts
 
+* Unsafe Docker privilege configuration
 
-\* Secret exposure through repository files, logs, diagnostics, or generated artifacts
+* Docker socket exposure to application containers
 
-\* Unsafe Docker privilege configuration
+* Command injection or unsafe subprocess handling
 
-\* Docker socket exposure to application containers
+* Authentication or authorization flaws in future public endpoints
 
-\* Command injection or unsafe subprocess handling
+* Data-integrity bypasses that can create duplicate or unbalanced ledger records
 
-\* Authentication or authorization flaws in future public endpoints
+* Evidence tampering that can incorrectly create a `GO` result
 
-\* Data-integrity bypasses that can create duplicate or unbalanced ledger records
+* Dependency or container image vulnerabilities with practical project impact
 
-\* Evidence tampering that can incorrectly create a `GO` result
+* Unsafe default network or database exposure
 
-\* Dependency or container image vulnerabilities with practical project impact
-
-\* Unsafe default network or database exposure
-
-
-
-\## 6. Out of Scope
-
-
+## 6. Out of Scope
 
 The following are out of scope:
 
+* Issues in unsupported forks or modified deployments
 
+* Reports requiring access to private systems not owned by this project
 
-\* Issues in unsupported forks or modified deployments
+* Social engineering
 
-\* Reports requiring access to private systems not owned by this project
+* Denial-of-service testing against systems without authorization
 
-\* Social engineering
+* Vulnerabilities in third-party services where this project has no control
 
-\* Denial-of-service testing against systems without authorization
+* Reports based only on theoretical impact without a reproducible project-specific path
 
-\* Vulnerabilities in third-party services where this project has no control
+* Requests to include private enterprise configuration or internal integration details
 
-\* Reports based only on theoretical impact without a reproducible project-specific path
-
-\* Requests to include private enterprise configuration or internal integration details
-
-
-
-\## 7. Security Requirements for Contributors
-
-
+## 7. Security Requirements for Contributors
 
 Contributors must:
 
+* Use synthetic data only.
 
+* Never commit secrets or private configuration.
 
-\* Use synthetic data only.
+* Avoid privileged containers.
 
-\* Never commit secrets or private configuration.
+* Avoid mounting the Docker socket into application containers.
 
-\* Avoid privileged containers.
+* Keep PostgreSQL private by default.
 
-\* Avoid mounting the Docker socket into application containers.
+* Add or update tests for security-sensitive behavior.
 
-\* Keep PostgreSQL private by default.
+* Update the threat model or ADRs when security boundaries change.
 
-\* Add or update tests for security-sensitive behavior.
+* Use dependency versions that can be reviewed and pinned.
 
-\* Update the threat model or ADRs when security boundaries change.
-
-\* Use dependency versions that can be reviewed and pinned.
-
-
-
-\## 8. Sensitive Artifact Handling
-
-
+## 8. Sensitive Artifact Handling
 
 Generated evidence bundles, scanner results, logs, and diagnostics may contain sensitive technical details.
 
-
-
 Do not commit generated artifacts unless they are intentionally synthetic, reviewed, and required as a test fixture.
-
-
 
 The `artifacts/` directory is excluded from Git except for its `.gitkeep` placeholder.
 
-
-
-\## 9. Security References
-
-
+## 9. Security References
 
 Primary project security guidance:
 
+* `docs/ENGINEERING_GUARDRAILS.md`
 
+* `docs/THREAT_MODEL.md`
 
-\* `docs/ENGINEERING\_GUARDRAILS.md`
+* `docs/ARCHITECTURE.md`
 
-\* `docs/THREAT\_MODEL.md`
-
-\* `docs/ARCHITECTURE.md`
-
-\* `docs/INTEGRATION\_CONTRACTS.md`
+* `docs/INTEGRATION_CONTRACTS.md`

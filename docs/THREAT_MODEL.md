@@ -1,30 +1,18 @@
-\# Threat Model
+# Threat Model
 
+**Project:** Compose Release Assurance
 
+**Document status:** Draft v0.1
 
-\*\*Project:\*\* Compose Release Assurance
+**Scope:** Public, source-available reference implementation, local development, controlled CI, and authorized rehearsal environments
 
-\*\*Document status:\*\* Draft v0.1
-
-\*\*Scope:\*\* Open-source reference implementation, local development, controlled CI, and authorized rehearsal environments
-
-
-
-\## 1. Security Objective
-
-
+## 1. Security Objective
 
 The project must safely validate release readiness without exposing secrets, internal infrastructure details, sensitive logs, or real financial data.
 
+The framework must prefer a conservative `NO_GO` outcome over an unsupported or unverifiable `GO` result.
 
-
-The framework must prefer a conservative `NO\_GO` outcome over an unsupported or unverifiable `GO` result.
-
-
-
-\## 2. Protected Assets
-
-
+## 2. Protected Assets
 
 | Asset                                       | Why it matters                                                   |
 
@@ -46,43 +34,33 @@ The framework must prefer a conservative `NO\_GO` outcome over an unsupported or
 
 | Monitoring data and logs                    | May accidentally include sensitive values                        |
 
-
-
-\## 3. Trust Boundaries
-
-
+## 3. Trust Boundaries
 
 ```text
 
 Public Git repository
 
-&#x20;       |
+        |
 
 Developer workstation / CI runner
 
-&#x20;       |
+        |
 
 Docker Engine and Compose environment
 
-&#x20;       |
+        |
 
 Application and database network
 
-&#x20;       |
+        |
 
 External quality, security, registry, deployment, and monitoring evidence
 
 ```
 
-
-
 Each boundary must validate inputs and avoid implicit trust.
 
-
-
-\## 4. Threats and Controls
-
-
+## 4. Threats and Controls
 
 | Threat                                   | Example                                                     | Primary controls                                                                             |
 
@@ -112,17 +90,13 @@ Each boundary must validate inputs and avoid implicit trust.
 
 | Sensitive logging                        | Password, token, or full payload appears in logs            | Structured logging, redaction, synthetic data, review log fields                             |
 
-| Dependency outage                        | Database or API unavailable during rehearsal                | Timeouts, bounded retries, readiness checks, explicit NO\_GO                                  |
+| Dependency outage                        | Database or API unavailable during rehearsal                | Timeouts, bounded retries, readiness checks, explicit NO_GO                                  |
 
 | Malicious evidence file                  | Crafted JSON exploits parser or causes misleading result    | Schema validation, file-size limits, strict parsing                                          |
 
 | Public branding or confidentiality issue | Company details included in public repository               | Vendor-neutral wording, no internal names, endpoints, logs, or screenshots                   |
 
-
-
-\## 5. STRIDE Summary
-
-
+## 5. STRIDE Summary
 
 | Category               | Relevant risks                                                              |
 
@@ -140,11 +114,7 @@ Each boundary must validate inputs and avoid implicit trust.
 
 | Elevation of privilege | Docker socket access, privileged container, unsafe Ansible credentials      |
 
-
-
-\## 6. Mandatory Security Controls for MVP
-
-
+## 6. Mandatory Security Controls for MVP
 
 ```text
 
@@ -178,11 +148,7 @@ Structured logging with redaction
 
 ```
 
-
-
-\## 7. Security Controls Deferred Beyond MVP
-
-
+## 7. Security Controls Deferred Beyond MVP
 
 ```text
 
@@ -206,75 +172,55 @@ Multi-tenant authorization model
 
 ```
 
-
-
-\## 8. Security Review Triggers
-
-
+## 8. Security Review Triggers
 
 A threat-model update and ADR review are required when any of these change:
 
+* New external service or registry integration
 
+* New secret type or credential flow
 
-\* New external service or registry integration
+* New network exposure
 
-\* New secret type or credential flow
+* New persistent storage
 
-\* New network exposure
+* New deployment target
 
-\* New persistent storage
+* Docker socket usage proposal
 
-\* New deployment target
+* New privileged operation
 
-\* Docker socket usage proposal
+* New evidence source
 
-\* New privileged operation
+* New public API endpoint
 
-\* New evidence source
+* New recovery or backup mechanism
 
-\* New public API endpoint
-
-\* New recovery or backup mechanism
-
-
-
-\## 9. Incident and Failure Handling
-
-
+## 9. Incident and Failure Handling
 
 When an integrity, health, security, or evidence failure occurs:
 
-
-
 ```text
 
-1\. Stop release approval.
+1. Stop release approval.
 
-2\. Mark the result as NO\_GO unless an explicit policy states otherwise.
+2. Mark the result as NO_GO unless an explicit policy states otherwise.
 
-3\. Collect redacted diagnostics.
+3. Collect redacted diagnostics.
 
-4\. Preserve evidence with checksums.
+4. Preserve evidence with checksums.
 
-5\. Provide actionable failure context.
+5. Provide actionable failure context.
 
-6\. Avoid automatic destructive cleanup before evidence collection completes.
+6. Avoid automatic destructive cleanup before evidence collection completes.
 
 ```
 
-
-
-\## 10. Non-Goals
-
-
+## 10. Non-Goals
 
 This threat model does not claim to certify the project for use in a regulated production environment.
 
-
-
 A real organizational deployment would additionally require:
-
-
 
 ```text
 

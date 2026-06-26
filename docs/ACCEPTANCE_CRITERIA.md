@@ -1,32 +1,18 @@
-\# Acceptance Criteria
+# Acceptance Criteria
 
+**Project:** Compose Release Assurance
 
+**Document status:** Draft v0.1
 
-\*\*Project:\*\* Compose Release Assurance
+## 1. Delivery Principle
 
-\*\*Document status:\*\* Draft v0.1
-
-
-
-\## 1. Delivery Principle
-
-
-
-A feature is complete only when it is implemented, tested, observable, documented, and recoverable according to `ENGINEERING\_GUARDRAILS.md`.
-
-
+A feature is complete only when it is implemented, tested, observable, documented, and recoverable according to `ENGINEERING_GUARDRAILS.md`.
 
 A working happy-path demo alone is not sufficient.
 
-
-
-\## 2. MVP Definition
-
-
+## 2. MVP Definition
 
 The MVP is complete when the project can execute:
-
-
 
 ```text
 
@@ -34,79 +20,57 @@ rehearsalctl rehearse --scenario api-restart
 
 ```
 
-
-
 and produce a deterministic release decision with evidence.
 
+## 3. MVP Functional Acceptance Criteria
 
+### 3.1 Reference Stack
 
-\## 3. MVP Functional Acceptance Criteria
+* The stack contains `ledger-api` and PostgreSQL.
 
+* The stack starts using Docker Compose.
 
+* PostgreSQL is not publicly exposed by default.
 
-\### 3.1 Reference Stack
+* The API provides `/health`, `/ready`, and `/metrics`.
 
+* The API runs as a non-root user where practical.
 
+* The stack uses explicit image tags rather than `latest` in release-oriented configuration.
 
-\* The stack contains `ledger-api` and PostgreSQL.
+### 3.2 Transaction Integrity
 
-\* The stack starts using Docker Compose.
+* A transfer request requires an idempotency key.
 
-\* PostgreSQL is not publicly exposed by default.
+* Repeating the same request with the same idempotency key does not create duplicate records.
 
-\* The API provides `/health`, `/ready`, and `/metrics`.
+* Every successful transfer creates balanced debit and credit ledger records.
 
-\* The API runs as a non-root user where practical.
+* Every successful transfer creates an audit record.
 
-\* The stack uses explicit image tags rather than `latest` in release-oriented configuration.
+* Integrity validation detects duplicate or unbalanced records.
 
+* Any integrity failure results in `NO_GO`.
 
+### 3.3 API Restart Rehearsal
 
-\### 3.2 Transaction Integrity
+* The rehearsal command starts the stack or verifies that it is ready.
 
+* The command creates a synthetic transfer.
 
+* The API container is restarted in a controlled manner.
 
-\* A transfer request requires an idempotency key.
+* The original request is retried with the same idempotency key.
 
-\* Repeating the same request with the same idempotency key does not create duplicate records.
+* The command verifies that no duplicate transfer was created.
 
-\* Every successful transfer creates balanced debit and credit ledger records.
+* The command records restart and recovery evidence.
 
-\* Every successful transfer creates an audit record.
+* The command exits with code `0` only when mandatory checks pass.
 
-\* Integrity validation detects duplicate or unbalanced records.
-
-\* Any integrity failure results in `NO\_GO`.
-
-
-
-\### 3.3 API Restart Rehearsal
-
-
-
-\* The rehearsal command starts the stack or verifies that it is ready.
-
-\* The command creates a synthetic transfer.
-
-\* The API container is restarted in a controlled manner.
-
-\* The original request is retried with the same idempotency key.
-
-\* The command verifies that no duplicate transfer was created.
-
-\* The command records restart and recovery evidence.
-
-\* The command exits with code `0` only when mandatory checks pass.
-
-
-
-\### 3.4 Runtime Evidence
-
-
+### 3.4 Runtime Evidence
 
 The rehearsal output must include:
-
-
 
 ```text
 
@@ -124,177 +88,125 @@ checksums.sha256
 
 ```
 
-
-
 Evidence must include:
 
+* Container state
 
+* Health and readiness result
 
-\* Container state
+* Scenario start and end time
 
-\* Health and readiness result
+* Release decision
 
-\* Scenario start and end time
+* Integrity result
 
-\* Release decision
+* Relevant diagnostic information
 
-\* Integrity result
+* SHA-256 checksums
 
-\* Relevant diagnostic information
+### 3.5 Observability
 
-\* SHA-256 checksums
+* Prometheus collects API metrics.
 
+* Grafana provides a release-health dashboard.
 
+* At minimum, metrics include request count, error count, latency, readiness state, and recovery duration.
 
-\### 3.5 Observability
+* Logs must not expose credentials, tokens, or secrets.
 
+### 3.6 Security Baseline
 
+* No secrets are committed to Git.
 
-\* Prometheus collects API metrics.
+* `.env.example` contains placeholders only.
 
-\* Grafana provides a release-health dashboard.
+* Grype scanning can produce a security report.
 
-\* At minimum, metrics include request count, error count, latency, readiness state, and recovery duration.
+* An SBOM can be generated.
 
-\* Logs must not expose credentials, tokens, or secrets.
+* A critical unresolved security finding produces `NO_GO`.
 
+* The project documents how enterprise quality and security evidence can be normalized without requiring live access to enterprise systems.
 
-
-\### 3.6 Security Baseline
-
-
-
-\* No secrets are committed to Git.
-
-\* `.env.example` contains placeholders only.
-
-\* Grype scanning can produce a security report.
-
-\* An SBOM can be generated.
-
-\* A critical unresolved security finding produces `NO\_GO`.
-
-\* The project documents how enterprise quality and security evidence can be normalized without requiring live access to enterprise systems.
-
-
-
-\### 3.7 Documentation
-
-
+### 3.7 Documentation
 
 The repository must include:
-
-
 
 ```text
 
 README.md
 
-docs/ENGINEERING\_GUARDRAILS.md
+docs/ENGINEERING_GUARDRAILS.md
 
-docs/PRODUCT\_VISION.md
+docs/PRODUCT_VISION.md
 
-docs/ACCEPTANCE\_CRITERIA.md
+docs/ACCEPTANCE_CRITERIA.md
 
-docs/architecture.md
+docs/ARCHITECTURE.md
 
-docs/threat-model.md
+docs/THREAT_MODEL.md
 
-docs/integration-contracts.md
+docs/INTEGRATION_CONTRACTS.md
 
 docs/adr/
 
 ```
 
+## 4. Non-Functional Acceptance Criteria
 
+### Maintainability
 
-\## 4. Non-Functional Acceptance Criteria
+* Python code passes formatting, linting, and type checks.
 
+* New behavior is covered by automated tests.
 
+* Major decisions are recorded as ADRs.
 
-\### Maintainability
+* Scripts are readable, documented, and use safe shell practices.
 
+### Reliability
 
+* Critical operations use bounded timeouts and retries.
 
-\* Python code passes formatting, linting, and type checks.
+* Failure paths provide actionable messages.
 
-\* New behavior is covered by automated tests.
+* Cleanup behavior is documented.
 
-\* Major decisions are recorded as ADRs.
+* The system does not silently ignore failed validation.
 
-\* Scripts are readable, documented, and use safe shell practices.
+### Security
 
+* No privileged containers.
 
+* No Docker socket mount in application containers.
 
-\### Reliability
+* Database access remains internal by default.
 
+* Public examples use synthetic data only.
 
+### Performance
 
-\* Critical operations use bounded timeouts and retries.
+* Performance claims must be backed by measurements.
 
-\* Failure paths provide actionable messages.
+* The project records recovery duration.
 
-\* Cleanup behavior is documented.
+* The API must avoid obvious blocking operations in critical request paths.
 
-\* The system does not silently ignore failed validation.
+* Resource usage must be visible through diagnostics and monitoring.
 
+## 5. Release Decision Criteria
 
-
-\### Security
-
-
-
-\* No privileged containers.
-
-\* No Docker socket mount in application containers.
-
-\* Database access remains internal by default.
-
-\* Public examples use synthetic data only.
-
-
-
-\### Performance
-
-
-
-\* Performance claims must be backed by measurements.
-
-\* The project records recovery duration.
-
-\* The API must avoid obvious blocking operations in critical request paths.
-
-\* Resource usage must be visible through diagnostics and monitoring.
-
-
-
-\## 5. Release Decision Criteria
-
-
-
-\### GO
-
-
+### GO
 
 All mandatory checks pass.
 
-
-
-\### CONDITIONAL\_GO
-
-
+### CONDITIONAL_GO
 
 A non-critical issue exists, is documented, and has an explicit approval or waiver in the evidence bundle.
 
-
-
-\### NO\_GO
-
-
+### NO_GO
 
 Any mandatory failure exists, including:
-
-
 
 ```text
 
@@ -316,26 +228,20 @@ Invalid checksum manifest
 
 ```
 
-
-
-\## 6. Definition of Done for Every Work Item
-
-
+## 6. Definition of Done for Every Work Item
 
 A work item is complete only when:
 
+* Acceptance criteria are met.
 
+* Relevant unit or integration tests pass.
 
-\* Acceptance criteria are met.
+* Security implications are reviewed.
 
-\* Relevant unit or integration tests pass.
+* Logs, metrics, and diagnostics are considered.
 
-\* Security implications are reviewed.
+* Failure and recovery behavior are defined.
 
-\* Logs, metrics, and diagnostics are considered.
+* Documentation is updated.
 
-\* Failure and recovery behavior are defined.
-
-\* Documentation is updated.
-
-\* No critical unresolved issue remains hidden.
+* No critical unresolved issue remains hidden.

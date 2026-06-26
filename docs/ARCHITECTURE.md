@@ -1,104 +1,74 @@
-\# Architecture
+# Architecture
 
+**Project:** Compose Release Assurance
 
+**Document status:** Draft v0.1
 
-\*\*Project:\*\* Compose Release Assurance
+**Architecture style:** Modular monolith reference implementation with adapter boundaries
 
-\*\*Document status:\*\* Draft v0.1
-
-\*\*Architecture style:\*\* Modular monolith reference implementation with adapter boundaries
-
-
-
-\## 1. Architectural Goal
-
-
+## 1. Architectural Goal
 
 Compose Release Assurance validates whether a Docker Compose-based stateful release is ready to proceed.
 
-
-
 The system does not replace CI/CD platforms, security scanners, registries, deployment tools, or monitoring platforms. It collects and normalizes their relevant evidence, executes controlled rehearsal scenarios, validates runtime behavior and data integrity, then produces a conservative release decision.
-
-
 
 The architecture prioritizes:
 
+1. Security and confidentiality
 
+2. Data integrity
 
-1\. Security and confidentiality
+3. Safe recovery
 
-2\. Data integrity
+4. Observability
 
-3\. Safe recovery
+5. Maintainability
 
-4\. Observability
+6. Reproducibility
 
-5\. Maintainability
+7. Performance
 
-6\. Reproducibility
-
-7\. Performance
-
-
-
-\## 2. System Context
-
-
+## 2. System Context
 
 ```mermaid
 
 flowchart TD
 
-&#x20;   DEV\[Developer or CI Runner] --> CLI\[rehearsalctl CLI]
+    DEV[Developer or CI Runner] --> CLI[rehearsalctl CLI]
 
+    CLI --> COMPOSE[Docker Compose Environment]
 
+    CLI --> EVIDENCE[Evidence Builder]
 
-&#x20;   CLI --> COMPOSE\[Docker Compose Environment]
+    CLI --> ADAPTERS[Enterprise Evidence Adapters]
 
-&#x20;   CLI --> EVIDENCE\[Evidence Builder]
+    COMPOSE --> API[ledger-api]
 
-&#x20;   CLI --> ADAPTERS\[Enterprise Evidence Adapters]
+    COMPOSE --> DB[(PostgreSQL)]
 
+    COMPOSE --> PROM[Prometheus]
 
+    PROM --> GRAFANA[Grafana]
 
-&#x20;   COMPOSE --> API\[ledger-api]
+    ADAPTERS --> QUALITY[Quality Gate Evidence]
 
-&#x20;   COMPOSE --> DB\[(PostgreSQL)]
+    ADAPTERS --> SECURITY[Security Scan Evidence]
 
-&#x20;   COMPOSE --> PROM\[Prometheus]
+    ADAPTERS --> PIPELINE[Pipeline Context]
 
-&#x20;   PROM --> GRAFANA\[Grafana]
+    ADAPTERS --> DEPLOYMENT[Deployment Result]
 
+    API --> DB
 
+    API --> PROM
 
-&#x20;   ADAPTERS --> QUALITY\[Quality Gate Evidence]
+    EVIDENCE --> DECISION[GO / CONDITIONAL_GO / NO_GO]
 
-&#x20;   ADAPTERS --> SECURITY\[Security Scan Evidence]
-
-&#x20;   ADAPTERS --> PIPELINE\[Pipeline Context]
-
-&#x20;   ADAPTERS --> DEPLOYMENT\[Deployment Result]
-
-
-
-&#x20;   API --> DB
-
-&#x20;   API --> PROM
-
-
-
-&#x20;   EVIDENCE --> DECISION\[GO / CONDITIONAL\_GO / NO\_GO]
-
-&#x20;   EVIDENCE --> BUNDLE\[Evidence Bundle]
+    EVIDENCE --> BUNDLE[Evidence Bundle]
 
 ```
 
-
-
-\## 3. Core Components
-
-
+## 3. Core Components
 
 | Component             | Responsibility                                                                                | Must not own                                                     |
 
@@ -124,19 +94,11 @@ flowchart TD
 
 | Observability stack   | Collects and presents runtime metrics                                                         | Release decision logic                                           |
 
-
-
-\## 4. Deployment Model
-
-
+## 4. Deployment Model
 
 The initial deployment target is Docker Compose.
 
-
-
 The first environment contains:
-
-
 
 ```text
 
@@ -150,11 +112,7 @@ grafana
 
 ```
 
-
-
 Profiles will separate concerns:
-
-
 
 ```text
 
@@ -168,87 +126,67 @@ debug           = optional troubleshooting tools
 
 ```
 
-
-
 The PostgreSQL service remains on an internal network by default. It must not expose a host port in release-oriented Compose configuration.
 
-
-
-\## 5. Rehearsal Flow
-
-
+## 5. Rehearsal Flow
 
 ```text
 
-1\. Validate prerequisites and configuration.
+1. Validate prerequisites and configuration.
 
-2\. Load pipeline, quality, security, and deployment evidence when available.
+2. Load pipeline, quality, security, and deployment evidence when available.
 
-3\. Start or validate the Compose environment.
+3. Start or validate the Compose environment.
 
-4\. Validate health and readiness.
+4. Validate health and readiness.
 
-5\. Execute a smoke transaction.
+5. Execute a smoke transaction.
 
-6\. Execute the selected rehearsal scenario.
+6. Execute the selected rehearsal scenario.
 
-7\. Validate transaction and ledger invariants.
+7. Validate transaction and ledger invariants.
 
-8\. Collect metrics, logs, diagnostics, and runtime state.
+8. Collect metrics, logs, diagnostics, and runtime state.
 
-9\. Build an evidence bundle.
+9. Build an evidence bundle.
 
-10\. Apply release policy.
+10. Apply release policy.
 
-11\. Return GO, CONDITIONAL\_GO, or NO\_GO with an explicit process exit code.
+11. Return GO, CONDITIONAL_GO, or NO_GO with an explicit process exit code.
 
 ```
 
-
-
-\## 6. MVP Scenario: API Restart
-
-
+## 6. MVP Scenario: API Restart
 
 The first end-to-end scenario is `api-restart`.
 
-
-
 ```text
 
-1\. Start the core stack.
+1. Start the core stack.
 
-2\. Confirm API health and database readiness.
+2. Confirm API health and database readiness.
 
-3\. Submit a synthetic transfer with an idempotency key.
+3. Submit a synthetic transfer with an idempotency key.
 
-4\. Restart the API container in a controlled manner.
+4. Restart the API container in a controlled manner.
 
-5\. Submit the same transfer with the same idempotency key.
+5. Submit the same transfer with the same idempotency key.
 
-6\. Confirm no duplicate transfer exists.
+6. Confirm no duplicate transfer exists.
 
-7\. Confirm ledger debit and credit entries remain balanced.
+7. Confirm ledger debit and credit entries remain balanced.
 
-8\. Record recovery duration and runtime evidence.
+8. Record recovery duration and runtime evidence.
 
-9\. Produce a release decision and evidence bundle.
+9. Produce a release decision and evidence bundle.
 
 ```
 
-
-
-\## 7. Data Integrity Model
-
-
+## 7. Data Integrity Model
 
 The reference application uses synthetic data only.
 
-
-
 Every successful transfer must create:
-
-
 
 ```text
 
@@ -264,11 +202,7 @@ Audit record
 
 ```
 
-
-
 Mandatory invariants:
-
-
 
 ```text
 
@@ -280,69 +214,49 @@ Debit total equals credit total.
 
 Every successful transfer has an audit record.
 
-Any invariant failure produces NO\_GO.
+Any invariant failure produces NO_GO.
 
 ```
 
-
-
 Database operations affecting these records must be transactional.
 
-
-
-\## 8. Dependency Direction
-
-
+## 8. Dependency Direction
 
 The dependency direction is intentionally strict:
-
-
 
 ```text
 
 Domain rules
 
-&#x20;   ↑
+    ↑
 
 Application services
 
-&#x20;   ↑
+    ↑
 
 Ports / interfaces
 
-&#x20;   ↑
+    ↑
 
 Infrastructure adapters
 
 ```
 
-
-
 Examples:
 
+* Ledger integrity rules must not directly call Docker.
 
+* Release policy must not directly depend on Azure Pipelines, SonarQube, Fortify, Nexus, or Grafana.
 
-\* Ledger integrity rules must not directly call Docker.
+* Enterprise integrations provide normalized input through adapters.
 
-\* Release policy must not directly depend on Azure Pipelines, SonarQube, Fortify, Nexus, or Grafana.
+* Docker Compose interactions remain isolated behind an orchestration boundary.
 
-\* Enterprise integrations provide normalized input through adapters.
-
-\* Docker Compose interactions remain isolated behind an orchestration boundary.
-
-
-
-\## 9. Evidence Contracts
-
-
+## 9. Evidence Contracts
 
 The core system consumes and produces vendor-neutral files.
 
-
-
 Examples:
-
-
 
 ```text
 
@@ -370,15 +284,9 @@ checksums.sha256
 
 ```
 
-
-
 This keeps the framework compatible with Azure Pipelines, Jenkins, SonarQube, Fortify, Nexus-compatible registries, Ansible, Prometheus, Grafana, and future adapters without embedding vendor-specific logic in the core.
 
-
-
-\## 10. Trust Boundaries
-
-
+## 10. Trust Boundaries
 
 | Boundary                                   | Risk                                          | Control                                                     |
 
@@ -396,61 +304,47 @@ This keeps the framework compatible with Azure Pipelines, Jenkins, SonarQube, Fo
 
 | CI system to registry or deployment target | Credential misuse                             | Secret variables, least privilege, no committed credentials |
 
-
-
-\## 11. Failure Semantics
-
-
+## 11. Failure Semantics
 
 The framework fails closed for mandatory requirements.
 
-
-
 Examples:
-
-
 
 ```text
 
-Health check fails                  -> NO\_GO
+Health check fails                  -> NO_GO
 
-Readiness check fails               -> NO\_GO
+Readiness check fails               -> NO_GO
 
-Evidence is missing                 -> NO\_GO
+Evidence is missing                 -> NO_GO
 
-Duplicate transaction exists        -> NO\_GO
+Duplicate transaction exists        -> NO_GO
 
-Ledger balance is invalid           -> NO\_GO
+Ledger balance is invalid           -> NO_GO
 
-Security finding exceeds policy     -> NO\_GO
+Security finding exceeds policy     -> NO_GO
 
-Optional adapter unavailable        -> CONDITIONAL\_GO or documented skip
+Optional adapter unavailable        -> CONDITIONAL_GO or documented skip
 
 ```
 
-
-
 No mandatory validation may silently pass after an error.
 
-
-
-\## 12. Planned Repository Structure
-
-
+## 12. Planned Repository Structure
 
 ```text
 
 apps/
 
-&#x20; ledger-api/
+  ledger-api/
 
 platform/
 
-&#x20; rehearsalctl/
+  rehearsalctl/
 
 infra/
 
-&#x20; compose/
+  compose/
 
 ansible/
 
@@ -466,36 +360,30 @@ tests/
 
 docs/
 
-&#x20; adr/
+  adr/
 
 artifacts/
 
 ```
 
-
-
-\## 13. Deferred Decisions
-
-
+## 13. Deferred Decisions
 
 The following decisions are intentionally deferred until the MVP is working:
 
+* CLI framework selection
 
+* ORM and migration tooling selection
 
-\* CLI framework selection
+* Exact metric names and dashboard layout
 
-\* ORM and migration tooling selection
+* HTML report rendering implementation
 
-\* Exact metric names and dashboard layout
+* Local registry versus Docker Hub demo flow
 
-\* HTML report rendering implementation
+* Azure Pipelines and Jenkins adapter depth
 
-\* Local registry versus Docker Hub demo flow
+* Fortify, SonarQube, Nexus, Dynatrace, Zabbix, SolarWinds, and Nessus integration depth
 
-\* Azure Pipelines and Jenkins adapter depth
+* Terraform provisioning module
 
-\* Fortify, SonarQube, Nexus, Dynatrace, Zabbix, SolarWinds, and Nessus integration depth
-
-\* Terraform provisioning module
-
-\* Advanced network-fault tooling
+* Advanced network-fault tooling

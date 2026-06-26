@@ -1,310 +1,222 @@
-\# Product Vision
+# Product Vision
 
+**Project name:** Compose Release Assurance
 
+**Working repository name:** `compose-release-assurance`
 
-\*\*Project name:\*\* Compose Release Assurance
+**Document status:** Draft v0.1
 
-\*\*Working repository name:\*\* `compose-release-assurance`
+## 1. Vision
 
-\*\*Document status:\*\* Draft v0.1
-
-
-
-\## 1. Vision
-
-
-
-Compose Release Assurance is an open-source, production-engineered reference framework for validating whether a Docker Compose-based stateful application is ready for release.
-
-
+Compose Release Assurance is a publicly available, source-available, production-engineered reference framework for validating whether a Docker Compose-based stateful application is ready for release.
 
 The framework combines quality, security, deployment, runtime health, recovery, and data-integrity evidence into one repeatable release rehearsal workflow.
 
-
-
 Its purpose is not to replace CI/CD platforms, scanners, registries, monitoring platforms, or automation tools. Its purpose is to connect their outputs into a clear and auditable release decision.
 
-
-
-\## 2. Problem Statement
-
-
+## 2. Problem Statement
 
 A successful container build or a green deployment job does not prove that a release is operationally safe.
 
-
-
 Before a stateful service is released, engineering teams need evidence that:
 
+* The application starts successfully.
 
+* Dependencies are ready and reachable.
 
-\* The application starts successfully.
+* Health and readiness checks pass.
 
-\* Dependencies are ready and reachable.
+* Security and quality gates are evaluated.
 
-\* Health and readiness checks pass.
+* A service restart does not produce duplicate writes.
 
-\* Security and quality gates are evaluated.
+* A database restart or restore does not corrupt or lose critical data.
 
-\* A service restart does not produce duplicate writes.
+* Runtime metrics and diagnostics are available.
 
-\* A database restart or restore does not corrupt or lose critical data.
+* Failures can be investigated using collected evidence.
 
-\* Runtime metrics and diagnostics are available.
-
-\* Failures can be investigated using collected evidence.
-
-\* The release outcome can be clearly classified as `GO`, `CONDITIONAL\_GO`, or `NO\_GO`.
-
-
+* The release outcome can be clearly classified as `GO`, `CONDITIONAL_GO`, or `NO_GO`.
 
 In many delivery workflows, this evidence is scattered across CI systems, code-quality tools, security scanners, registries, deployment automation, logs, and monitoring systems.
 
-
-
 Compose Release Assurance provides a structured way to gather, validate, and package that evidence.
 
-
-
-\## 3. Target Users
-
-
+## 3. Target Users
 
 Primary users:
 
+* DevSecOps engineers
 
+* Platform engineers
 
-\* DevSecOps engineers
+* SRE and operations engineers
 
-\* Platform engineers
+* Backend engineers responsible for stateful services
 
-\* SRE and operations engineers
-
-\* Backend engineers responsible for stateful services
-
-\* Teams using Docker Compose for development, staging, internal platforms, or controlled deployments
-
-
+* Teams using Docker Compose for development, staging, internal platforms, or controlled deployments
 
 Secondary users:
 
+* Engineering managers reviewing release readiness
 
+* Security teams reviewing delivery evidence
 
-\* Engineering managers reviewing release readiness
+* Students and junior engineers learning production-oriented DevSecOps practices
 
-\* Security teams reviewing delivery evidence
-
-\* Students and junior engineers learning production-oriented DevSecOps practices
-
-
-
-\## 4. Reference Target Application
-
-
+## 4. Reference Target Application
 
 The framework will include a synthetic reference application called `ledger-api`.
 
-
-
 `ledger-api` is not a real payment system. It uses synthetic data only.
-
-
 
 The application demonstrates a stateful transaction workflow with:
 
+* Transaction creation
 
+* Idempotency-key support
 
-\* Transaction creation
+* PostgreSQL persistence
 
-\* Idempotency-key support
+* Double-entry ledger records
 
-\* PostgreSQL persistence
+* Audit records
 
-\* Double-entry ledger records
+* Health endpoint
 
-\* Audit records
+* Readiness endpoint
 
-\* Health endpoint
-
-\* Readiness endpoint
-
-\* Prometheus metrics endpoint
-
-
+* Prometheus metrics endpoint
 
 The reference application exists to demonstrate that release assurance must validate functional correctness and data integrity, not only container uptime.
 
+## 5. Product Boundaries
 
+### In Scope for V1
 
-\## 5. Product Boundaries
+* Docker Compose-based deployment target
 
+* FastAPI and PostgreSQL reference stack
 
+* Health and readiness validation
 
-\### In Scope for V1
+* API restart rehearsal
 
+* Idempotency validation
 
+* Ledger-integrity validation
 
-\* Docker Compose-based deployment target
+* Backup and restore validation
 
-\* FastAPI and PostgreSQL reference stack
+* Prometheus metrics collection
 
-\* Health and readiness validation
+* Grafana dashboard
 
-\* API restart rehearsal
+* Runtime diagnostic collection
 
-\* Idempotency validation
+* Grype security scan support
 
-\* Ledger-integrity validation
+* SBOM generation
 
-\* Backup and restore validation
+* Markdown and JSON evidence bundle
 
-\* Prometheus metrics collection
+* GO / CONDITIONAL_GO / NO_GO decision
 
-\* Grafana dashboard
+* Azure Pipelines reference template
 
-\* Runtime diagnostic collection
+* Ansible deployment and rollback reference
 
-\* Grype security scan support
+* Vendor-neutral evidence contracts
 
-\* SBOM generation
+### Explicitly Out of Scope for V1
 
-\* Markdown and JSON evidence bundle
+* Real financial transactions
 
-\* GO / CONDITIONAL\_GO / NO\_GO decision
+* Real customer data
 
-\* Azure Pipelines reference template
+* Real payment-provider integrations
 
-\* Ansible deployment and rollback reference
+* Kubernetes orchestration
 
-\* Vendor-neutral evidence contracts
+* Terraform-based infrastructure provisioning
 
+* Production access to Fortify, Nexus, SonarQube, Azure DevOps Server, Dynatrace, Zabbix, SolarWinds, or Nessus
 
+* Full chaos engineering platform
 
-\### Explicitly Out of Scope for V1
+* Multi-region deployment
 
+* Enterprise identity and access management
 
+* A web control panel for the framework
 
-\* Real financial transactions
-
-\* Real customer data
-
-\* Real payment-provider integrations
-
-\* Kubernetes orchestration
-
-\* Terraform-based infrastructure provisioning
-
-\* Production access to Fortify, Nexus, SonarQube, Azure DevOps Server, Dynatrace, Zabbix, SolarWinds, or Nessus
-
-\* Full chaos engineering platform
-
-\* Multi-region deployment
-
-\* Enterprise identity and access management
-
-\* A web control panel for the framework
-
-
-
-\## 6. Core Value Proposition
-
-
+## 6. Core Value Proposition
 
 Compose Release Assurance answers one practical question:
 
-
-
 > Is this Compose-based release healthy, secure enough for its policy, recoverable after expected failures, and supported by evidence?
-
-
 
 The framework produces a repeatable evidence package rather than relying on informal manual checks.
 
-
-
-\## 7. Enterprise Compatibility
-
-
+## 7. Enterprise Compatibility
 
 The core framework remains vendor-neutral.
 
-
-
 It will support normalized evidence contracts that can be produced by enterprise systems such as:
 
+* Azure Pipelines
 
+* Jenkins
 
-\* Azure Pipelines
+* SonarQube Server
 
-\* Jenkins
+* Fortify
 
-\* SonarQube Server
+* Nexus-compatible registries
 
-\* Fortify
+* Ansible
 
-\* Nexus-compatible registries
+* Prometheus and Grafana
 
-\* Ansible
+* Grype
 
-\* Prometheus and Grafana
-
-\* Grype
-
-\* External vulnerability-scanning systems
-
-
+* External vulnerability-scanning systems
 
 The project must never claim a live integration with an enterprise tool unless that integration has been tested in an authorized environment.
 
-
-
-\## 8. Release Decision Model
-
-
+## 8. Release Decision Model
 
 The framework will issue one of three decisions:
-
-
 
 ```text
 
 GO
 
-CONDITIONAL\_GO
+CONDITIONAL_GO
 
-NO\_GO
+NO_GO
 
 ```
 
+A `NO_GO` result is required when a mandatory requirement fails, including:
 
+* Failed health or readiness validation
 
-A `NO\_GO` result is required when a mandatory requirement fails, including:
+* Failed data-integrity validation
 
+* Duplicate transaction creation
 
+* Failed backup or restore validation
 
-\* Failed health or readiness validation
+* Critical unresolved security finding
 
-\* Failed data-integrity validation
+* Missing mandatory evidence
 
-\* Duplicate transaction creation
+* Invalid or incomplete checksum manifest
 
-\* Failed backup or restore validation
-
-\* Critical unresolved security finding
-
-\* Missing mandatory evidence
-
-\* Invalid or incomplete checksum manifest
-
-
-
-\## 9. Success Definition
-
-
+## 9. Success Definition
 
 The first meaningful product milestone is achieved when one command can execute a complete API restart rehearsal:
-
-
 
 ```text
 
@@ -312,26 +224,22 @@ rehearsalctl rehearse --scenario api-restart
 
 ```
 
-
-
 The command must:
 
+1. Start the Compose stack.
 
+2. Validate health and readiness.
 
-1\. Start the Compose stack.
+3. Create a synthetic transfer.
 
-2\. Validate health and readiness.
+4. Restart the API container.
 
-3\. Create a synthetic transfer.
+5. Retry the request using the same idempotency key.
 
-4\. Restart the API container.
+6. Confirm that no duplicate transaction was created.
 
-5\. Retry the request using the same idempotency key.
+7. Collect runtime evidence.
 
-6\. Confirm that no duplicate transaction was created.
+8. Produce Markdown and JSON reports.
 
-7\. Collect runtime evidence.
-
-8\. Produce Markdown and JSON reports.
-
-9\. Return a clear `GO` or `NO\_GO` result.
+9. Return a clear `GO` or `NO_GO` result.

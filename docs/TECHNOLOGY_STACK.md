@@ -1,79 +1,52 @@
-\# Technology Stack and Language Boundaries
+# Technology Stack and Language Boundaries
 
+**Project:** Compose Release Assurance
 
+**Document status:** Draft v0.1
 
-\*\*Project:\*\* Compose Release Assurance
+**Purpose:** Define the programming languages, declarative formats, and technology boundaries used by the project.
 
-\*\*Document status:\*\* Draft v0.1
+## 1. Core Decision
 
-\*\*Purpose:\*\* Define the programming languages, declarative formats, and technology boundaries used by the project.
-
-
-
-\## 1. Core Decision
-
-
-
-Compose Release Assurance adopts a \*\*Python-first modular monolith\*\* approach.
-
-
+Compose Release Assurance adopts a **Python-first modular monolith** approach.
 
 Python is the primary implementation language for:
 
+* `ledger-api`
 
+* `rehearsalctl`
 
-\* `ledger-api`
+* Release-policy evaluation
 
-\* `rehearsalctl`
+* Evidence generation
 
-\* Release-policy evaluation
+* Integrity validation
 
-\* Evidence generation
+* Enterprise evidence adapters
 
-\* Integrity validation
+* Automated tests
 
-\* Enterprise evidence adapters
-
-\* Automated tests
-
-\* Local developer tooling
-
-
+* Local developer tooling
 
 The project avoids unnecessary polyglot architecture during the MVP.
 
+## 2. Primary Runtime
 
+### Python
 
-\## 2. Primary Runtime
-
-
-
-\### Python
-
-
-
-\*\*Initial supported runtime:\*\* Python 3.14
+**Initial supported runtime:** Python 3.14
 
 Python 3.14 is the initial supported runtime for local development, CI, and the reference container environment.
 
 Additional Python versions must not be presented as supported until automated CI validation proves compatibility.
 
-
 Python will be used for all core executable product logic.
-
-
 
 It provides one consistent language for API development, command-line orchestration, test automation, JSON evidence processing, integration adapters, diagnostics, and policy evaluation.
 
-
-
 The exact patch version and container image digest will be pinned when the reproducible development environment is created.
 
-
-
-\## 3. Language and Format Matrix
-
-
+## 3. Language and Format Matrix
 
 | Area                      | Language or format                | Responsibility                                                             |
 
@@ -111,25 +84,17 @@ The exact patch version and container image digest will be pinned when the repro
 
 | Documentation             | Markdown                          | Architecture, security, ADRs, runbooks, contribution guidance              |
 
-
-
-\## 4. API Implementation Policy
-
-
+## 4. API Implementation Policy
 
 The synthetic `ledger-api` will use Python and FastAPI.
 
-
-
 The API must provide:
-
-
 
 ```text
 
 POST /transfers
 
-GET /transfers/{reference\_id}
+GET /transfers/{reference_id}
 
 GET /health
 
@@ -139,35 +104,19 @@ GET /metrics
 
 ```
 
-
-
 The MVP must prioritize correctness and observability over theoretical throughput.
-
-
 
 The initial database access model will be synchronous.
 
-
-
 The project must not introduce asynchronous database access until measurement demonstrates a concrete need and an ADR records the decision.
-
-
 
 No blocking database or Docker operation may run inside an asynchronous request path.
 
-
-
-\## 5. CLI Implementation Policy
-
-
+## 5. CLI Implementation Policy
 
 `rehearsalctl` will be a Python CLI.
 
-
-
 It will manage:
-
-
 
 ```text
 
@@ -187,47 +136,31 @@ verify
 
 ```
 
-
-
 The CLI must:
 
+* Use explicit command arguments.
 
+* Avoid unsafe shell-string interpolation.
 
-\* Use explicit command arguments.
+* Use bounded subprocess timeouts.
 
-\* Avoid unsafe shell-string interpolation.
+* Return deterministic process exit codes.
 
-\* Use bounded subprocess timeouts.
+* Produce actionable error messages.
 
-\* Return deterministic process exit codes.
+* Keep Docker and Compose interactions outside application containers.
 
-\* Produce actionable error messages.
-
-\* Keep Docker and Compose interactions outside application containers.
-
-\* Preserve evidence before destructive cleanup.
-
-
+* Preserve evidence before destructive cleanup.
 
 The exact CLI library is intentionally deferred until the Python quality foundation is established.
 
-
-
-\## 6. SQL and Database Policy
-
-
+## 6. SQL and Database Policy
 
 PostgreSQL is the only MVP database.
 
-
-
 SQL must enforce critical integrity safeguards where appropriate.
 
-
-
 The application must not rely solely on Python validation for:
-
-
 
 ```text
 
@@ -243,23 +176,13 @@ Audit record relationships
 
 ```
 
-
-
 Database migration design will be documented before schema implementation begins.
 
-
-
-\## 7. Declarative Infrastructure Policy
-
-
+## 7. Declarative Infrastructure Policy
 
 YAML is used for configuration and orchestration, not for core business logic.
 
-
-
 YAML files may define:
-
-
 
 ```text
 
@@ -277,27 +200,15 @@ Scenario metadata
 
 ```
 
-
-
 Complex decision logic must remain in tested Python code.
 
+## 8. Bash and PowerShell Boundaries
 
-
-\## 8. Bash and PowerShell Boundaries
-
-
-
-\### Bash
-
-
+### Bash
 
 Bash is limited to Linux and WSL operational helper scripts.
 
-
-
 Examples:
-
-
 
 ```text
 
@@ -315,11 +226,7 @@ Host prerequisite checks
 
 ```
 
-
-
 All Bash scripts must use:
-
-
 
 ```bash
 
@@ -327,27 +234,15 @@ set -Eeuo pipefail
 
 ```
 
-
-
-\### PowerShell
-
-
+### PowerShell
 
 PowerShell is limited to local Windows developer setup and repository commands.
 
-
-
 PowerShell must not contain core release policy, business rules, integrity validation, or production deployment logic.
 
-
-
-\## 9. Explicit MVP Exclusions
-
-
+## 9. Explicit MVP Exclusions
 
 The MVP will not use:
-
-
 
 ```text
 
@@ -377,19 +272,11 @@ AI agents
 
 ```
 
-
-
 These technologies may be evaluated only when a documented product requirement justifies them.
 
-
-
-\## 10. Technology Selection Rules
-
-
+## 10. Technology Selection Rules
 
 A new language, framework, service, or dependency may be introduced only when:
-
-
 
 ```text
 
@@ -409,21 +296,13 @@ An ADR is created when the change is architecturally significant.
 
 ```
 
-
-
-\## 11. Session Instruction
-
-
+## 11. Session Instruction
 
 For development sessions involving implementation decisions, use:
 
-
-
 ```text
 
-Read docs/ENGINEERING\_GUARDRAILS.md and docs/TECHNOLOGY\_STACK.md first.
-
-
+Read docs/ENGINEERING_GUARDRAILS.md and docs/TECHNOLOGY_STACK.md first.
 
 Treat both documents as binding engineering guidance. Preserve the Python-first modular monolith approach. Do not introduce a language, framework, service, dependency, or asynchronous architecture without a documented problem, security review, operational review, test plan, and—when significant—an ADR.
 
