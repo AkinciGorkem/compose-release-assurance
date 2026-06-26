@@ -1,0 +1,7 @@
+# Pinned direct development-tool dependencies.
+# Update versions only through a reviewed pull request.
+
+mypy==2.1.0
+pre-commit==4.5.1
+pytest==9.1.1
+ruff==0.15.19
