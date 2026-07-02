@@ -10,10 +10,12 @@ dependencies = []
 minversion = "9.0"
 addopts = ["-ra", "--strict-config", "--strict-markers"]
 testpaths = ["tests"]
+pythonpath = ["apps/ledger-api"]
 
 [tool.mypy]
 python_version = "3.14"
-files = ["tests"]
+files = ["apps/ledger-api", "tests"]
+mypy_path = "$MYPY_CONFIG_FILE_DIR/apps/ledger-api"
 strict = true
 warn_unused_configs = true
 show_error_codes = true
