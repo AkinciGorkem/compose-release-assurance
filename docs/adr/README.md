@@ -104,3 +104,4 @@ Describe the selected approach.
 | [ADR-0002](0002-python-first-runtime-and-language-boundaries.md) | Accepted | Python is the primary runtime; SQL, YAML, Bash, PowerShell, JSON, Markdown, and HTML/CSS have explicit boundaries. |
 | [ADR-0003](0003-python-314-runtime-baseline.md) | Accepted | Python 3.14 is the initial supported runtime; other Python versions require automated compatibility validation before support is claimed. |
 | [ADR-0004](0004-source-available-no-sale-license-policy.md) | Accepted | The project is public and source-available under Apache-2.0 with Commons Clause 1.0; resale and substantially equivalent paid offerings are restricted. |
+| [ADR-0005](0005-postgresql-relational-ledger-persistence-baseline.md) | Accepted | PostgreSQL uses versioned plain-SQL migrations and relational constraints; the future adapter owns transactional writes and safe replay. |
