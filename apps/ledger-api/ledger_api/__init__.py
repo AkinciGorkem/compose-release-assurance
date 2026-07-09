@@ -15,6 +15,7 @@ from ledger_api.models import (
     TransferResult,
 )
 from ledger_api.ports import LedgerStore
+from ledger_api.postgres_store import PostgresLedgerStore
 
 __all__ = [
     "AuditRecord",
@@ -28,6 +29,7 @@ __all__ = [
     "LedgerEntry",
     "LedgerSnapshot",
     "LedgerStore",
+    "PostgresLedgerStore",
     "Transfer",
     "TransferRequest",
     "TransferResult",

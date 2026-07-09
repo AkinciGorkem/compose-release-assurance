@@ -4,7 +4,9 @@ version = "0.1.0a0"
 description = "Release rehearsal and evidence framework for Docker Compose-based stateful services."
 readme = "README.md"
 requires-python = ">=3.14,<3.15"
-dependencies = []
+dependencies = [
+    "psycopg[binary]>=3.3.4,<3.4",
+]
 
 [tool.pytest.ini_options]
 minversion = "9.0"
@@ -35,3 +37,13 @@ indent-style = "space"
 line-ending = "lf"
 skip-magic-trailing-comma = false
 docstring-code-format = true
+[build-system]
+requires = ["setuptools>=80", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "apps/ledger-api"}
+
+[tool.setuptools.packages.find]
+where = ["apps/ledger-api"]
+include = ["ledger_api*"]
