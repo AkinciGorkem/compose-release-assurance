@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any, cast
+from uuid import uuid4
 
 from psycopg import Connection
 
+from ledger_api.errors import DomainValidationError
 from ledger_api.models import (
     AuditRecord,
     EntryDirection,
@@ -21,6 +23,8 @@ from ledger_api.models import (
 )
 
 ConnectionFactory = Callable[[], Connection[Any]]
+Clock = Callable[[], datetime]
+IdentifierFactory = Callable[[], str]
 DatabaseRow = tuple[Any, ...]
 
 
@@ -32,8 +36,18 @@ class PostgresLedgerStore:
     environment globals, logs, or committed files.
     """
 
-    def __init__(self, connection_factory: ConnectionFactory) -> None:
+    def __init__(
+        self,
+        connection_factory: ConnectionFactory,
+        *,
+        clock: Clock | None = None,
+        identifier_factory: IdentifierFactory | None = None,
+    ) -> None:
         self._connection_factory = connection_factory
+        self._clock = _utc_now if clock is None else clock
+        self._identifier_factory = (
+            _new_identifier if identifier_factory is None else identifier_factory
+        )
 
     def submit(self, request: TransferRequest) -> TransferResult:
         """Create or safely replay a transfer as one atomic PostgreSQL operation."""
@@ -124,6 +138,21 @@ class PostgresLedgerStore:
                         )
                     ),
                 )
+
+
+def _utc_now() -> datetime:
+    return datetime.now(UTC)
+
+
+def _new_identifier() -> str:
+    return str(uuid4())
+
+
+def _require_utc(value: datetime) -> datetime:
+    if value.tzinfo is None or value.utcoffset() is None:
+        raise DomainValidationError("clock must return a timezone-aware datetime.")
+
+    return value.astimezone(UTC)
 
 
 def _execute(connection: Connection[Any], statement: str) -> None:

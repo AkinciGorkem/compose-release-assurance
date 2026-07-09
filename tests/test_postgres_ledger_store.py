@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
+from datetime import UTC, datetime
+from itertools import count
 from pathlib import Path
 from typing import Any
 
@@ -19,7 +22,11 @@ MIGRATION_PATH = (
 
 
 def test_postgres_ledger_store_satisfies_the_ledger_store_contract() -> None:
-    store = PostgresLedgerStore(connection_factory=_unexpected_connection)
+    store = PostgresLedgerStore(
+        connection_factory=_unexpected_connection,
+        clock=_fixed_clock,
+        identifier_factory=_identifier_factory(),
+    )
 
     assert isinstance(store, LedgerStore)
 
@@ -61,6 +68,19 @@ def test_postgres_ledger_store_reads_a_valid_snapshot_from_postgresql() -> None:
 
 def _unexpected_connection() -> Any:
     raise AssertionError("The skeleton contract test must not open a database connection.")
+
+
+def _fixed_clock() -> datetime:
+    return datetime(2026, 7, 9, 10, 0, tzinfo=UTC)
+
+
+def _identifier_factory() -> Callable[[], str]:
+    sequence = count(1)
+
+    def next_identifier() -> str:
+        return f"postgres-id-{next(sequence)}"
+
+    return next_identifier
 
 
 def _reset_database(dsn: str) -> None:
